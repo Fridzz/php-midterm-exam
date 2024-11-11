@@ -1,15 +1,16 @@
 <?php
 session_start();
 
-// Get student information from URL parameters if they exist
-$student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
-$first_name = isset($_GET['first_name']) ? $_GET['first_name'] : '';
-$last_name = isset($_GET['last_name']) ? $_GET['last_name'] : '';
+// Retrieve student details from the URL
+$student_id = isset($_GET['id']) ? $_GET['id'] : '';
+$studentID = isset($_GET['studentID']) ? $_GET['studentID'] : '';
+$firstName = isset($_GET['firstName']) ? $_GET['firstName'] : '';
+$lastName = isset($_GET['lastName']) ? $_GET['lastName'] : '';
 
-// Check if the student is found in the session and if they exist in the student list
+// Find the student index in the session array
 $student_index = null;
 foreach ($_SESSION['students'] as $index => $student) {
-    if ($student['student_id'] == $student_id) {
+    if ($student['id'] == $student_id) {
         $student_index = $index;
         break;
     }
@@ -20,9 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     if ($student_index !== null) {
         // Remove the student from the session array
         unset($_SESSION['students'][$student_index]);
-        
-        // Re-index the session array to avoid gaps in the index
         $_SESSION['students'] = array_values($_SESSION['students']);
+        $_SESSION['message'] = "Student with ID $studentID has been deleted.";
     }
 
     // Redirect to the register page after deletion
@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delete a Student</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -44,17 +45,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     <h2>Delete a Student</h2>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="register_student.php">Register Student</a></li>
+            <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
             <li class="breadcrumb-item active" aria-current="page">Delete Student</li>
         </ol>
     </nav>
     
+    <?php if (isset($_SESSION['message'])): ?>
+        <div class="alert alert-success">
+            <?= $_SESSION['message']; ?>
+            <?php unset($_SESSION['message']); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="card p-4">
+        <h4>Are you sure you want to delete the following student?</h4>
         <ul>
-            <li><strong>Student ID:</strong> <?= htmlspecialchars($student_id) ?></li>
-            <li><strong>First Name:</strong> <?= htmlspecialchars($first_name) ?></li>
-            <li><strong>Last Name:</strong> <?= htmlspecialchars($last_name) ?></li>
+            <li><strong>Student ID:</strong> <?= htmlspecialchars($studentID) ?></li>
+            <li><strong>First Name:</strong> <?= htmlspecialchars($firstName) ?></li>
+            <li><strong>Last Name:</strong> <?= htmlspecialchars($lastName) ?></li>
         </ul>
         
         <form method="POST">

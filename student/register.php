@@ -32,14 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Last name is required.";
     }
 
-    // Check for duplicate student ID (to avoid manual tampering)
-    foreach ($_SESSION['students'] as $student) {
-        if ($student['studentID'] === $studentID) {
-            $errors[] = "Duplicate Student ID.";
-            break;
-        }
-    }
-
     // If no errors, add the new student
     if (empty($errors)) {
         $_SESSION['students'][] = [
@@ -126,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <td><?php echo htmlspecialchars($student['lastName']); ?></td>
                             <td>
                                 <a href="edit.php?id=<?php echo $student['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="delete.php?id=<?php echo $student['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                <a href="delete.php?id=<?php echo $student['id']; ?>&studentID=<?php echo $student['studentID']; ?>&firstName=<?php echo urlencode($student['firstName']); ?>&lastName=<?php echo urlencode($student['lastName']); ?>" class="btn btn-danger btn-sm">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
